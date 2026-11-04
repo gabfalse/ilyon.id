@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 // Pages
 import Home from "../Pages/Home";
-import NotFound from "../pages/NotFound";
+import NotFound from "../Pages/NotFound";
 
 export default function AppRoutes() {
   return (
