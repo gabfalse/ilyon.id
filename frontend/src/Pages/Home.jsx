@@ -176,7 +176,7 @@ export default function Home() {
                     Welcome to
                   </p>
                   <h3 className="text-xl font-extrabold text-foreground">
-                    Ilyon Academy
+                    Ilyon
                   </h3>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E7F3F0] text-2xl">
