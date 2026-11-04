@@ -1,0 +1,168 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+/* =================================
+   ILYON ACADEMY DESIGN SYSTEM
+   Theme: Soft Modern Education
+================================= */
+
+@theme {
+  /* Brand Colors */
+  --color-ilyon-coral: #E78282;
+  --color-ilyon-yellow: #F2BD4B;
+  --color-ilyon-teal: #70B8AE;
+  --color-ilyon-purple: #9A7DB0;
+  --color-ilyon-blue: #6098C8;
+
+  /* Semantic Colors */
+  --color-primary: #70B8AE;
+  --color-primary-dark: #529F93;
+  --color-secondary: #9A7DB0;
+  --color-accent: #F2BD4B;
+  --color-info: #6098C8;
+  --color-highlight: #E78282;
+
+  /* Background */
+  --color-background: #FCFAF5;
+  --color-surface: #FFFFFF;
+  --color-muted: #F1F3F5;
+  --color-sidebar: #FFFFFF;
+
+  /* Text */
+  --color-foreground: #35485E;
+  --color-muted-foreground: #87919D;
+
+  /* Border */
+  --color-border: #E9ECEF;
+
+  /* Status */
+  --color-success: #70B8AE;
+  --color-warning: #F2BD4B;
+  --color-danger: #E78282;
+  --color-status-info: #6098C8;
+
+  /* Typography */
+  --font-sans: "Nunito Sans", sans-serif;
+
+  /* Radius */
+  --radius-card: 1rem;
+  --radius-button: 0.75rem;
+}
+
+/* =================================
+   GLOBAL VARIABLES
+================================= */
+
+:root {
+  color-scheme: light;
+
+  --app-background: #FCFAF5;
+  --app-surface: #FFFFFF;
+  --app-text: #35485E;
+  --app-border: #E9ECEF;
+
+  --sidebar-width: 260px;
+  --navbar-height: 68px;
+}
+
+/* =================================
+   BASE STYLES
+================================= */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Nunito Sans", sans-serif;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: #D7EBE7;
+    color: #35485E;
+  }
+}
+
+/* =================================
+   REUSABLE APP STYLES
+================================= */
+
+@layer components {
+  .app-card {
+    @apply rounded-2xl border border-border bg-white shadow-sm;
+  }
+
+  .app-input {
+    @apply w-full rounded-xl border border-border bg-white px-4 py-2.5
+    text-foreground outline-none transition-all
+    placeholder:text-muted-foreground
+    focus:border-primary focus:ring-2 focus:ring-primary/20;
+  }
+
+  .app-button-primary {
+    @apply inline-flex items-center justify-center gap-2
+    rounded-xl bg-primary px-5 py-2.5
+    font-semibold text-white transition-all
+    hover:bg-primary-dark active:scale-[0.98];
+  }
+
+  .app-button-secondary {
+    @apply inline-flex items-center justify-center gap-2
+    rounded-xl border border-border bg-white px-5 py-2.5
+    font-semibold text-foreground transition-all
+    hover:bg-muted;
+  }
+
+  .app-page-title {
+    @apply text-2xl font-bold tracking-tight text-foreground;
+  }
+
+  .app-page-description {
+    @apply mt-1 text-sm text-muted-foreground;
+  }
+}
+
+/* =================================
+   SCROLLBAR
+================================= */
+
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #D5DEDE transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #D5DEDE;
+    border-radius: 999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
