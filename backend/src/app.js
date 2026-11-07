@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import { pool } from "./config/database.js";
 
 dotenv.config();
 
@@ -37,7 +38,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Mengizinkan request tanpa origin, seperti server-to-server
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -70,13 +70,14 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       health: "/api/health",
+      database: "/api/health/database",
     },
     timestamp: new Date().toISOString(),
   });
 });
 
 // ==========================================
-// 6. HEALTH CHECK
+// 6. API HEALTH CHECK
 // ==========================================
 
 app.get("/api/health", (req, res) => {
@@ -90,7 +91,35 @@ app.get("/api/health", (req, res) => {
 });
 
 // ==========================================
-// 7. ROUTE TIDAK DITEMUKAN
+// 7. DATABASE HEALTH CHECK
+// ==========================================
+
+app.get("/api/health/database", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT NOW() AS server_time"
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Neon PostgreSQL berhasil terhubung!",
+      database: "connected",
+      serverTime: result.rows[0].server_time,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Database health check failed:", error.message);
+
+    res.status(503).json({
+      success: false,
+      message: "Koneksi ke database gagal",
+      database: "disconnected",
+    });
+  }
+});
+
+// ==========================================
+// 8. ROUTE NOT FOUND
 // ==========================================
 
 app.use((req, res) => {
@@ -102,7 +131,7 @@ app.use((req, res) => {
 });
 
 // ==========================================
-// 8. ERROR HANDLER
+// 9. ERROR HANDLER
 // ==========================================
 
 app.use((err, req, res, next) => {
