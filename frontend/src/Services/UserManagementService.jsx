@@ -1,4 +1,4 @@
-import { apiRequest } from "./api";
+import { apiRequest } from "./Api";
 
 const BASE_URL = "/api/user-management";
 
