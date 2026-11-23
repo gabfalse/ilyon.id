@@ -1,4 +1,3 @@
-
 import pg from "pg";
 import dotenv from "dotenv";
 
@@ -29,4 +28,9 @@ export async function testDatabaseConnection() {
     console.error("Koneksi database gagal:", error.message);
     return false;
   }
+}
+
+export async function closeDatabaseConnection() {
+  await pool.end();
+  console.log("Database connection pool berhasil ditutup.");
 }
