@@ -1,6 +1,11 @@
-
-import AppRoutes from "./Routes/AppRoutes";
+import IndexRoutes from "./Routes/IndexRoutes";
+import ContactAdmin from "./Components/ContactAdmin";
 
 export default function App() {
-  return <AppRoutes />;
+  return (
+    <>
+      <IndexRoutes />
+      <ContactAdmin />
+    </>
+  );
 }

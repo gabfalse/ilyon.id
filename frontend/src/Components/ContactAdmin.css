@@ -1,0 +1,69 @@
+.contact-admin {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 54px;
+  padding: 0 16px;
+
+  color: #ffffff;
+  background: #25d366;
+  border-radius: 999px;
+
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+
+  transition:
+    width 0.3s ease,
+    padding 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.contact-admin:hover {
+  background: #20bd5a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
+}
+
+.contact-admin-text {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.contact-admin-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-admin.icon-only {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+}
+
+@media (max-width: 480px) {
+  .contact-admin {
+    right: 16px;
+    bottom: 16px;
+    min-height: 50px;
+  }
+
+  .contact-admin.icon-only {
+    width: 50px;
+    height: 50px;
+  }
+
+  .contact-admin-text {
+    font-size: 12px;
+  }
+}
