@@ -87,3 +87,14 @@ export const activateAccountSchema = z.object({
     .min(8, "Password minimal 8 karakter")
     .max(128, "Password maksimal 128 karakter"),
 });
+
+// ==========================================
+// VALIDASI PERGANTIAN MODE AKUN
+// ==========================================
+
+export const switchAccountModeSchema = z.object({
+  activeMode: z.enum(["normal", "parent"], {
+    required_error: "Mode akun wajib dipilih",
+    invalid_type_error: "Mode akun tidak valid",
+  }),
+});

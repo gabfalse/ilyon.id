@@ -2,14 +2,6 @@ import { Router } from "express";
 import { z } from "zod";
 
 import {
-  listParents,
-  listEligibleParentAccounts,
-  detailParent,
-  storeParent,
-  restoreParentAccount,
-  editParent,
-  linkStudent,
-  unlinkStudent,
   getMyParentDashboard,
   submitStudentClaim,
   searchStudentsForParentController,
@@ -29,9 +21,6 @@ import {
 } from "../middlewares/csrf.middleware.js";
 
 import {
-  createParentSchema,
-  updateParentSchema,
-  linkParentStudentSchema,
   createParentStudentClaimSchema,
   rejectParentStudentClaimSchema,
 } from "../validators/parent.validator.js";
@@ -85,27 +74,44 @@ function validateParams(schema) {
   };
 }
 
-const parentIdSchema = z.object({
-  id: z.uuid(),
-});
-
-const parentStudentIdSchema = z.object({
-  id: z.uuid(),
-  studentId: z.uuid(),
-});
-
 const claimIdSchema = z.object({
   claimId: z.uuid(),
 });
 
 // ==========================================
-// AUTHENTICATION, AUTHORIZATION & BRANCH
+// AUTHENTICATION
 // ==========================================
 
 router.use(authenticate);
 
 // ==========================================
-// POST: PARENT MENGAJUKAN KLAIM SISWA
+// PARENT: DASHBOARD
+// ==========================================
+
+router.get("/me/dashboard", requireRole("parent"), getMyParentDashboard);
+
+// ==========================================
+// PARENT: DAFTAR PENGAJUAN ANAK
+// ==========================================
+
+router.get(
+  "/me/student-claims",
+  requireRole("parent"),
+  getMyParentStudentClaims,
+);
+
+// ==========================================
+// PARENT: MENCARI SISWA TERDAFTAR
+// ==========================================
+
+router.get(
+  "/me/available-students",
+  requireRole("parent"),
+  searchStudentsForParentController,
+);
+
+// ==========================================
+// PARENT: MENGAJUKAN KLAIM SISWA
 // ==========================================
 
 router.post(
@@ -118,39 +124,19 @@ router.post(
 );
 
 // ==========================================
-// DASHBOARD KHUSUS AKUN PARENT
-// ==========================================
-
-router.get("/me/dashboard", requireRole("parent"), getMyParentDashboard);
-
-router.get(
-  "/me/student-claims",
-  requireRole("parent"),
-  getMyParentStudentClaims,
-);
-
-// ==========================================
-// GET: PENCARIAN SISWA UNTUK PARENT
-// ==========================================
-
-router.get(
-  "/me/available-students",
-  requireRole("parent"),
-  searchStudentsForParentController,
-);
-
-// ==========================================
-// ENDPOINT MANAJEMEN PARENT
-// KHUSUS SUPER ADMIN DAN BRANCH ADMIN
+// ADMIN: AKSES PENGAJUAN ANAK
 // ==========================================
 
 router.use(requireRole("super_admin", "branch_admin"), resolveActiveBranch);
 
-// Admin: melihat seluruh pengajuan anak sesuai hak akses cabang
+// ==========================================
+// ADMIN: DAFTAR PENGAJUAN ANAK
+// ==========================================
+
 router.get("/student-claims", listParentStudentClaims);
 
 // ==========================================
-// POST: ADMIN MENYETUJUI KLAIM SISWA
+// ADMIN: MENYETUJUI PENGAJUAN
 // ==========================================
 
 router.post(
@@ -162,7 +148,7 @@ router.post(
 );
 
 // ==========================================
-// POST: ADMIN MENOLAK KLAIM SISWA
+// ADMIN: MENOLAK PENGAJUAN
 // ==========================================
 
 router.post(
@@ -172,85 +158,6 @@ router.post(
   validateParams(claimIdSchema),
   validate(rejectParentStudentClaimSchema),
   rejectStudentClaim,
-);
-
-// ==========================================
-// GET: AKUN YANG MEMENUHI SYARAT MENJADI PARENT
-// ==========================================
-
-router.get("/eligible-accounts", listEligibleParentAccounts);
-
-// ==========================================
-// GET: DAFTAR ORANG TUA
-// ==========================================
-
-router.get("/", listParents);
-
-// ==========================================
-// PUT: RESTORE PARENT ROLE
-// ==========================================
-
-router.post(
-  "/:id/restore-user",
-  verifyOrigin,
-  verifyCsrfToken,
-  restoreParentAccount,
-);
-
-// ==========================================
-// GET: DETAIL ORANG TUA
-// ==========================================
-
-router.get("/:id", validateParams(parentIdSchema), detailParent);
-
-// ==========================================
-// POST: TAMBAH ORANG TUA
-// ==========================================
-
-router.post(
-  "/",
-  verifyOrigin,
-  verifyCsrfToken,
-  validate(createParentSchema),
-  storeParent,
-);
-
-// ==========================================
-// PUT: EDIT ORANG TUA
-// ==========================================
-
-router.put(
-  "/:id",
-  verifyOrigin,
-  verifyCsrfToken,
-  validateParams(parentIdSchema),
-  validate(updateParentSchema),
-  editParent,
-);
-
-// ==========================================
-// POST: HUBUNGKAN ORANG TUA DENGAN SISWA
-// ==========================================
-
-router.post(
-  "/:id/students",
-  verifyOrigin,
-  verifyCsrfToken,
-  validateParams(parentIdSchema),
-  validate(linkParentStudentSchema),
-  linkStudent,
-);
-
-// ==========================================
-// DELETE: LEPASKAN HUBUNGAN ORANG TUA DAN SISWA
-// ==========================================
-
-router.delete(
-  "/:id/students/:studentId",
-  verifyOrigin,
-  verifyCsrfToken,
-  validateParams(parentStudentIdSchema),
-  unlinkStudent,
 );
 
 export default router;

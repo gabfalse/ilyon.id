@@ -1,16 +1,8 @@
 import { z } from "zod";
 
 import {
-  getAllParents,
-  getParentById,
-  getEligibleParentAccounts,
-  createParent,
-  updateParent,
-  linkParentWithStudent,
   getParentDashboardByUserId,
   getParentStudentClaimsByUserId,
-  unlinkParentFromStudent,
-  restoreParentToUser,
   createParentStudentClaim,
   searchStudentsForParent,
   getAllParentStudentClaims,
@@ -56,7 +48,6 @@ function getParentAccess(req) {
 
   const activeBranchId = req.activeBranchId ?? null;
 
-  // Validasi tambahan: cabang aktif harus termasuk penugasan pengguna.
   if (activeBranchId !== null && !branchIds.includes(activeBranchId)) {
     const error = new Error("Cabang aktif tidak termasuk penugasan Anda.");
     error.statusCode = 403;
@@ -71,232 +62,12 @@ function getParentAccess(req) {
 }
 
 // ==========================================
-// GET: DAFTAR AKUN YANG BISA DIJADIKAN ORANG TUA
-// ==========================================
-
-export async function listEligibleParentAccounts(req, res, next) {
-  try {
-    const accounts = await getEligibleParentAccounts();
-
-    return res.status(200).json({
-      success: true,
-      message: "Daftar akun yang memenuhi syarat berhasil diambil.",
-      data: accounts,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// GET: DAFTAR ORANG TUA
-// ==========================================
-
-export async function listParents(req, res, next) {
-  try {
-    const { search = "", page = "1", limit = "10" } = req.query;
-
-    const parsedPage = Number(page);
-    const parsedLimit = Number(limit);
-
-    if (
-      !Number.isInteger(parsedPage) ||
-      parsedPage < 1 ||
-      !Number.isInteger(parsedLimit) ||
-      parsedLimit < 1 ||
-      parsedLimit > 100
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Parameter page atau limit tidak valid.",
-      });
-    }
-
-    const access = getParentAccess(req);
-
-    const result = await getAllParents({
-      search: String(search).trim(),
-      page: parsedPage,
-      limit: parsedLimit,
-      access,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Daftar orang tua berhasil diambil.",
-      data: result.data,
-      pagination: result.pagination,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// GET: DETAIL ORANG TUA
-// ==========================================
-
-export async function detailParent(req, res, next) {
-  try {
-    const access = getParentAccess(req);
-
-    const parent = await getParentById(req.params.id, access);
-
-    if (!parent) {
-      return res.status(404).json({
-        success: false,
-        message: "Orang tua tidak ditemukan.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Detail orang tua berhasil diambil.",
-      data: parent,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// POST: TAMBAH ORANG TUA
-// ==========================================
-
-export async function storeParent(req, res, next) {
-  try {
-    const access = getParentAccess(req);
-
-    const parent = await createParent(req.body, {
-      ...access,
-      assignedBy: req.user.id,
-      ipAddress: req.ip,
-      userAgent: req.get("user-agent") || null,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "Orang tua berhasil ditambahkan.",
-      data: parent,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// PUT: EDIT ORANG TUA
-// ==========================================
-
-export async function editParent(req, res, next) {
-  try {
-    const access = getParentAccess(req);
-
-    const parent = await updateParent(req.params.id, req.body, access);
-
-    if (!parent) {
-      return res.status(404).json({
-        success: false,
-        message: "Orang tua tidak ditemukan.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Data orang tua berhasil diperbarui.",
-      data: parent,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// POST: HUBUNGKAN ORANG TUA DENGAN SISWA
-// ==========================================
-
-export async function linkStudent(req, res, next) {
-  try {
-    const access = getParentAccess(req);
-
-    const parent = await linkParentWithStudent(req.params.id, req.body, access);
-
-    return res.status(200).json({
-      success: true,
-      message: "Orang tua berhasil dihubungkan dengan siswa.",
-      data: parent,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// DELETE: LEPASKAN HUBUNGAN ORANG TUA DAN SISWA
-// ==========================================
-
-export async function unlinkStudent(req, res, next) {
-  try {
-    const access = getParentAccess(req);
-
-    const result = await unlinkParentFromStudent(
-      req.params.id,
-      req.params.studentId,
-      access,
-    );
-
-    if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: "Hubungan orang tua dengan siswa tidak ditemukan.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Hubungan orang tua dengan siswa berhasil dilepaskan.",
-      data: result,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-export async function restoreParentAccount(req, res, next) {
-  try {
-    const access = getParentAccess(req);
-
-    const result = await restoreParentToUser(req.params.id, {
-      ...access,
-      assignedBy: req.user.id,
-      ipAddress: req.ip,
-      userAgent: req.get("user-agent") || null,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Akun berhasil dikembalikan menjadi User.",
-      data: result,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// ==========================================
-// GET: DASHBOARD PARENT YANG SEDANG LOGIN
+// GET: DASHBOARD PARENT
 // ==========================================
 
 export async function getMyParentDashboard(req, res, next) {
   try {
     const dashboard = await getParentDashboardByUserId(req.user.id);
-
-    if (!dashboard) {
-      return res.status(404).json({
-        success: false,
-        message: "Profil orang tua tidak ditemukan.",
-      });
-    }
 
     return res.status(200).json({
       success: true,
@@ -309,7 +80,7 @@ export async function getMyParentDashboard(req, res, next) {
 }
 
 // ==========================================
-// GET MY PARENT STUDENT CLAIMS
+// GET: RIWAYAT PENGAJUAN ANAK PARENT
 // ==========================================
 
 export async function getMyParentStudentClaims(req, res, next) {
@@ -329,6 +100,7 @@ export async function getMyParentStudentClaims(req, res, next) {
 // ==========================================
 // GET: ADMIN LIST PARENT STUDENT CLAIMS
 // ==========================================
+
 export async function listParentStudentClaims(req, res, next) {
   try {
     const access = getParentAccess(req);

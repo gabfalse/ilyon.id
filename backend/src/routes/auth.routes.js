@@ -7,6 +7,8 @@ import {
   resendEmailOtpLimiter,
 } from "../middlewares/authRateLimit.middleware.js";
 
+import { switchAccountModeController } from "../controllers/accountMode.controller.js";
+
 import {
   register,
   login,
@@ -23,6 +25,7 @@ import {
   loginSchema,
   verifyEmailOtpSchema,
   resendEmailOtpSchema,
+  switchAccountModeSchema,
 } from "../validators/auth.validator.js";
 
 import {
@@ -121,3 +124,16 @@ router.post("/logout", verifyOrigin, verifyCsrfToken, authenticate, logout);
 router.get("/me", authenticate, me);
 
 export default router;
+
+// ==========================================
+// ACCOUNT MODE SWITCH
+// ==========================================
+
+router.patch(
+  "/switch-mode",
+  verifyOrigin,
+  verifyCsrfToken,
+  authenticate,
+  validate(switchAccountModeSchema),
+  switchAccountModeController,
+);

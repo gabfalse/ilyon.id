@@ -36,6 +36,7 @@ export async function authenticate(req, res, next) {
       sessionId: session.session_id,
 
       isActive: session.is_active,
+      activeMode: session.active_mode || "normal",
 
       // Semua role dan cabang pengguna
       roles: session.roles || [],

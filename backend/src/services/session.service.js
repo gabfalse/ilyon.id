@@ -38,7 +38,7 @@ export async function createSession(userId, token, metadata = {}, db = pool) {
 
 // ==========================================
 // MEMERIKSA SESSION DAN MENGAMBIL DATA USER
-// TERMASUK ROLE DAN CABANG
+// TERMASUK ROLE, CABANG, DAN MODE AKTIF
 // ==========================================
 
 export async function getSessionByToken(token) {
@@ -54,6 +54,7 @@ export async function getSessionByToken(token) {
       u.phone,
       u.full_name,
       u.is_active,
+      u.active_mode,
 
       COALESCE(
         jsonb_agg(

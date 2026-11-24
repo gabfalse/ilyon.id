@@ -299,10 +299,10 @@ export async function loginUser(identifier, password, metadata = {}) {
           u.email,
           u.phone,
           u.full_name,
-          u.password_hash,
-          u.email_verified_at,
-          u.is_active,
-
+u.password_hash,
+u.email_verified_at,
+u.is_active,
+u.active_mode,
           EXISTS (
             SELECT 1
             FROM user_branch_roles ubr
@@ -388,6 +388,7 @@ export async function loginUser(identifier, password, metadata = {}) {
         email: user.email,
         phone: user.phone,
         fullName: user.full_name,
+        activeMode: user.active_mode || "normal",
       },
       sessionToken,
       session,
