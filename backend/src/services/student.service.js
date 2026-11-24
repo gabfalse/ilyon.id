@@ -438,3 +438,89 @@ export async function updateStudentStatus(id, status, auditContext = {}) {
     client.release();
   }
 }
+
+// ==========================================
+// GET STUDENTS FOR LOGGED-IN TUTOR
+// ==========================================
+
+export async function getMyTutorStudents({
+  userId,
+  search = "",
+  page = 1,
+  limit = 10,
+} = {}) {
+  const conditions = [
+    "s.deleted_at IS NULL",
+    "s.status = 'active'",
+    `
+      EXISTS (
+        SELECT 1
+        FROM tutor_profiles tp
+        INNER JOIN tutor_branch_assignments tba
+          ON tba.tutor_id = tp.id
+        WHERE tp.user_id = $1
+          AND tba.branch_id = s.primary_branch_id
+          AND tba.assigned_from <= CURRENT_DATE
+          AND (
+            tba.assigned_until IS NULL
+            OR tba.assigned_until >= CURRENT_DATE
+          )
+      )
+    `,
+  ];
+
+  const values = [userId];
+  let index = 2;
+
+  if (search) {
+    conditions.push(`
+      (
+        s.student_code ILIKE $${index}
+        OR s.full_name ILIKE $${index}
+        OR s.nickname ILIKE $${index}
+        OR s.school_name ILIKE $${index}
+      )
+    `);
+
+    values.push(`%${search}%`);
+    index++;
+  }
+
+  const whereClause = `
+    WHERE ${conditions.join(" AND ")}
+  `;
+
+  const offset = (page - 1) * limit;
+
+  const countResult = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM students s
+      ${whereClause}
+    `,
+    values,
+  );
+
+  const dataResult = await pool.query(
+    `
+      ${studentSelect}
+      ${whereClause}
+      ORDER BY s.full_name ASC
+      LIMIT $${index}
+      OFFSET $${index + 1}
+    `,
+    [...values, limit, offset],
+  );
+
+  const total = Number(countResult.rows[0].count);
+
+  return {
+    data: dataResult.rows,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    },
+  };
+}

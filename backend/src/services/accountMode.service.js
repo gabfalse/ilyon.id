@@ -31,7 +31,7 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
   try {
     await client.query("BEGIN");
 
-    // Lock akun agar pergantian mode tidak berjalan bersamaan.
+    // 1. Lock akun
     const userResult = await client.query(
       `
         SELECT id, active_mode, is_active
@@ -48,17 +48,14 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
 
     const user = userResult.rows[0];
 
-    // Pastikan akun merupakan akun publik.
-    // Akun admin, branch admin, tutor, dan staff tidak boleh
-    // menggunakan fitur pergantian mode ini.
+    // 2. Validasi role publik
     const roleResult = await client.query(
       `
         SELECT
           r.role_code,
           ubr.is_active
         FROM user_branch_roles ubr
-        INNER JOIN roles r
-          ON r.id = ubr.role_id
+        INNER JOIN roles r ON r.id = ubr.role_id
         WHERE ubr.user_id = $1
           AND ubr.branch_id IS NULL
           AND r.role_code IN ('user', 'parent')
@@ -77,14 +74,13 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
       );
     }
 
-    // Jangan izinkan akun dengan role staf/admin mengganti mode.
+    // 3. Cegah akun staf/admin mengganti mode
     const protectedRoleResult = await client.query(
       `
         SELECT EXISTS (
           SELECT 1
           FROM user_branch_roles ubr
-          INNER JOIN roles r
-            ON r.id = ubr.role_id
+          INNER JOIN roles r ON r.id = ubr.role_id
           WHERE ubr.user_id = $1
             AND ubr.is_active = TRUE
             AND r.role_code IN (
@@ -105,10 +101,23 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
       );
     }
 
+    // 4. Tentukan mode dan role
     const targetRole = targetMode === "parent" ? "parent" : "user";
     const previousMode = user.active_mode || "normal";
 
-    // Ambil ID role tujuan.
+    // 5. Jika mode sudah aktif, jangan buat perubahan atau audit log
+    if (previousMode === targetMode) {
+      await client.query("COMMIT");
+
+      return {
+        activeMode: targetMode,
+        activeRole: targetRole,
+        unchanged: true,
+        message: "Mode akun sudah aktif.",
+      };
+    }
+
+    // 6. Ambil ID role tujuan
     const targetRoleResult = await client.query(
       `
         SELECT id
@@ -128,25 +137,46 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
 
     const targetRoleId = targetRoleResult.rows[0].id;
 
-    // Pastikan role tujuan tersedia.
-    // Jika belum ada, buat role global.
-    await client.query(
+    // 7. Cari record role tujuan yang sudah tersedia
+    const existingRoleResult = await client.query(
       `
-        INSERT INTO user_branch_roles (
-          user_id,
-          role_id,
-          branch_id,
-          assigned_by,
-          is_active
-        )
-        VALUES ($1, $2, NULL, NULL, FALSE)
-        ON CONFLICT (user_id, role_id, branch_id)
-        DO NOTHING
+        SELECT id
+        FROM user_branch_roles
+        WHERE user_id = $1
+          AND role_id = $2
+          AND branch_id IS NULL
+        ORDER BY is_active DESC
+        LIMIT 1
+        FOR UPDATE
       `,
       [userId, targetRoleId],
     );
 
-    // Nonaktifkan kedua role publik terlebih dahulu.
+    let targetAssignmentId;
+
+    if (existingRoleResult.rowCount > 0) {
+      targetAssignmentId = existingRoleResult.rows[0].id;
+    } else {
+      // Buat hanya jika belum tersedia
+      const insertResult = await client.query(
+        `
+          INSERT INTO user_branch_roles (
+            user_id,
+            role_id,
+            branch_id,
+            assigned_by,
+            is_active
+          )
+          VALUES ($1, $2, NULL, NULL, FALSE)
+          RETURNING id
+        `,
+        [userId, targetRoleId],
+      );
+
+      targetAssignmentId = insertResult.rows[0].id;
+    }
+
+    // 8. Nonaktifkan role publik
     await client.query(
       `
         UPDATE user_branch_roles ubr
@@ -156,23 +186,22 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
           AND ubr.user_id = $1
           AND ubr.branch_id IS NULL
           AND r.role_code IN ('user', 'parent')
+          AND ubr.is_active = TRUE
       `,
       [userId],
     );
 
-    // Aktifkan hanya role tujuan.
+    // 9. Aktifkan satu record role tujuan
     await client.query(
       `
         UPDATE user_branch_roles
         SET is_active = TRUE
-        WHERE user_id = $1
-          AND role_id = $2
-          AND branch_id IS NULL
+        WHERE id = $1
       `,
-      [userId, targetRoleId],
+      [targetAssignmentId],
     );
 
-    // Simpan mode akun.
+    // 10. Simpan mode akun
     await client.query(
       `
         UPDATE users
@@ -184,7 +213,7 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
       [targetMode, userId],
     );
 
-    // Catat audit log dalam transaksi yang sama.
+    // 11. Catat audit log hanya untuk perubahan aktual
     await createAuditLog(
       {
         userId,
@@ -211,6 +240,7 @@ export async function switchAccountMode(userId, targetMode, metadata = {}) {
     return {
       activeMode: targetMode,
       activeRole: targetRole,
+      unchanged: false,
       message:
         targetMode === "parent"
           ? "Mode Akun Orang Tua berhasil diaktifkan."

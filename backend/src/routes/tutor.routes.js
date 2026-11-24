@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { z } from "zod";
-
+import { getMyTutorStudentsController } from "../controllers/tutor.controller.js";
 import {
   listTutors,
   detailTutor,
   storeTutor,
   updateTutorController,
   updateTutorStatusController,
+  getMyTutorProfile,
 } from "../controllers/tutor.controller.js";
 
 import { authenticate } from "../middlewares/auth.middleware.js";
@@ -60,6 +61,19 @@ function validateParams(schema) {
     next();
   };
 }
+
+// ==========================================
+// GET PROFIL TUTOR YANG SEDANG LOGIN
+// ==========================================
+
+router.get("/me", authenticate, requireRole("tutor"), getMyTutorProfile);
+
+router.get(
+  "/me/students",
+  authenticate,
+  requireRole("tutor"),
+  getMyTutorStudentsController,
+);
 
 // ==========================================
 // AUTHORIZATION

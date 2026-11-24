@@ -1,10 +1,13 @@
 import {
   getAllTutors,
   getTutorById,
+  getTutorByUserId,
   createTutor,
   updateTutor,
   updateTutorStatus,
 } from "../services/tutor.service.js";
+
+import { getMyTutorStudents } from "../services/student.service.js";
 
 // ==========================================
 // GET: DAFTAR TUTOR
@@ -151,6 +154,73 @@ export async function updateTutorStatusController(req, res, next) {
         ? "Tutor berhasil diaktifkan kembali."
         : "Tutor berhasil dinonaktifkan.",
       data: tutor,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// ==========================================
+// GET MY TUTOR PROFILE
+// ==========================================
+
+export async function getMyTutorProfile(req, res, next) {
+  try {
+    const tutor = await getTutorByUserId(req.user.id);
+
+    if (!tutor) {
+      return res.status(404).json({
+        success: false,
+        message: "Profil tutor tidak ditemukan.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profil tutor berhasil diambil.",
+      data: tutor,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// ==========================================
+// GET MY TUTOR STUDENTS
+// ==========================================
+
+export async function getMyTutorStudentsController(req, res, next) {
+  try {
+    const { search = "", page = "1", limit = "10" } = req.query;
+
+    const parsedPage = Number(page);
+    const parsedLimit = Number(limit);
+
+    if (
+      !Number.isInteger(parsedPage) ||
+      parsedPage < 1 ||
+      !Number.isInteger(parsedLimit) ||
+      parsedLimit < 1 ||
+      parsedLimit > 100
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Parameter page atau limit tidak valid.",
+      });
+    }
+
+    const result = await getMyTutorStudents({
+      userId: req.user.id,
+      search: String(search).trim(),
+      page: parsedPage,
+      limit: parsedLimit,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Daftar siswa tutor berhasil diambil.",
+      data: result.data,
+      pagination: result.pagination,
     });
   } catch (error) {
     return next(error);

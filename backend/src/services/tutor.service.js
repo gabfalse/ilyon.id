@@ -1469,3 +1469,25 @@ export async function updateTutorStatus(id, isActive, auditContext) {
     client.release();
   }
 }
+
+// ==========================================
+// GET TUTOR BY LOGIN USER ID
+// ==========================================
+
+export async function getTutorByUserId(userId) {
+  const result = await pool.query(
+    `
+      SELECT id
+      FROM tutor_profiles
+      WHERE user_id = $1
+      LIMIT 1
+    `,
+    [userId],
+  );
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  return getTutorById(result.rows[0].id);
+}
