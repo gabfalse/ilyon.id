@@ -724,7 +724,7 @@ export default function RecruitmentApplications() {
               <section>
                 <div className="mb-3">
                   <h3 className="font-semibold text-[#35485E]">
-                    Surat Lamaran{" "}
+                    Punya kendaraan?{" "}
                     <span className="text-xs font-normal text-gray-400">
                       (Opsional)
                     </span>

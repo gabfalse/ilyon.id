@@ -495,7 +495,7 @@ export default function RecruitmentDetail() {
                 onChange={handleChange}
                 placeholder="https://portofolioanda.com"
                 helper="Cantumkan tautan portofolio jika tersedia."
-                required
+                optional
               />
 
               <div className="mt-5">
