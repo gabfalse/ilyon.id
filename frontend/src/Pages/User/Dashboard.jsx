@@ -37,27 +37,27 @@ const STATISTIC_CONFIG = [
     icon: "♙",
     color: "bg-blue-50 text-blue-600",
   },
-  {
-    key: "branches",
-    title: "Cabang & Unit",
-    description: "Termasuk kantor pusat",
-    icon: "⌂",
-    color: "bg-emerald-50 text-emerald-600",
-  },
-  {
-    key: "tutors",
-    title: "Tutor",
-    description: "Tenaga pengajar",
-    icon: "♧",
-    color: "bg-violet-50 text-violet-600",
-  },
-  {
-    key: "staff",
-    title: "Staff",
-    description: "Tim operasional",
-    icon: "◎",
-    color: "bg-orange-50 text-orange-600",
-  },
+  // {
+  //   key: "branches",
+  //   title: "Cabang & Unit",
+  //   description: "Termasuk kantor pusat",
+  //   icon: "⌂",
+  //   color: "bg-emerald-50 text-emerald-600",
+  // },
+  // {
+  //   key: "tutors",
+  //   title: "Tutor",
+  //   description: "Tenaga pengajar",
+  //   icon: "♧",
+  //   color: "bg-violet-50 text-violet-600",
+  // },
+  // {
+  //   key: "staff",
+  //   title: "Staff",
+  //   description: "Tim operasional",
+  //   icon: "◎",
+  //   color: "bg-orange-50 text-orange-600",
+  // },
   {
     key: "programs",
     title: "Program",
@@ -72,13 +72,13 @@ const STATISTIC_CONFIG = [
     icon: "▣",
     color: "bg-pink-50 text-pink-600",
   },
-  {
-    key: "classes",
-    title: "Kelas",
-    description: "Kelas pembelajaran",
-    icon: "▦",
-    color: "bg-amber-50 text-amber-600",
-  },
+  // {
+  //   key: "classes",
+  //   title: "Kelas",
+  //   description: "Kelas pembelajaran",
+  //   icon: "▦",
+  //   color: "bg-amber-50 text-amber-600",
+  // },
 ];
 
 // ==========================================

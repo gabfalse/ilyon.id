@@ -29,9 +29,9 @@ import PublicProgramsSection from "../../Components/PublicProgramsSection";
 
 const STATISTICS = [
   { key: "students", label: "Siswa Terdaftar", icon: Users },
-  { key: "branches", label: "Cabang & Unit", icon: Building2 },
-  { key: "tutors", label: "Tutor", icon: GraduationCap },
-  { key: "staff", label: "Tim Staff", icon: BriefcaseBusiness },
+  // { key: "branches", label: "Cabang & Unit", icon: Building2 },
+  // { key: "tutors", label: "Tutor", icon: GraduationCap },
+  // { key: "staff", label: "Tim Staff", icon: BriefcaseBusiness },
   { key: "programs", label: "Program Belajar", icon: BookOpen },
   { key: "offerings", label: "Pilihan Layanan", icon: Layers3 },
 ];
@@ -283,13 +283,16 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-6 lg:grid-cols-6">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-7 sm:gap-x-10 sm:gap-y-8">
             {STATISTICS.map((item) => {
               const Icon = item.icon;
               const value = statistics?.[item.key]?.total;
 
               return (
-                <div key={item.key} className="text-center">
+                <div
+                  key={item.key}
+                  className="w-[calc(50%-12px)] text-center sm:w-[calc(33.333%-27px)] lg:w-[calc(16.666%-34px)]"
+                >
                   <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-[#EAF5F3] text-[#529F93] sm:h-12 sm:w-12 sm:rounded-2xl">
                     <Icon size={21} strokeWidth={1.8} />
                   </div>
