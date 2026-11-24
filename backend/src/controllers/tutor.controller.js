@@ -6,8 +6,10 @@ import {
   updateTutor,
   updateTutorStatus,
 } from "../services/tutor.service.js";
-
-import { getMyTutorStudents } from "../services/student.service.js";
+import {
+  getMyTutorStudents,
+  getMyTutorStudentById,
+} from "../services/student.service.js";
 
 // ==========================================
 // GET: DAFTAR TUTOR
@@ -221,6 +223,32 @@ export async function getMyTutorStudentsController(req, res, next) {
       message: "Daftar siswa tutor berhasil diambil.",
       data: result.data,
       pagination: result.pagination,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// ==========================================
+// GET MY TUTOR STUDENT DETAIL
+// ==========================================
+
+export async function getMyTutorStudentDetailController(req, res, next) {
+  try {
+    const student = await getMyTutorStudentById(req.user.id, req.params.id);
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Siswa tidak ditemukan atau tidak termasuk cabang penugasan Anda.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Detail siswa berhasil diambil.",
+      data: student,
     });
   } catch (error) {
     return next(error);

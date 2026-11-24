@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { getMyTutorStudentsController } from "../controllers/tutor.controller.js";
+
 import {
   listTutors,
   detailTutor,
@@ -8,10 +8,20 @@ import {
   updateTutorController,
   updateTutorStatusController,
   getMyTutorProfile,
+  getMyTutorStudentsController,
+  getMyTutorStudentDetailController,
 } from "../controllers/tutor.controller.js";
+
+import {
+  getMyTutorLearningSubjectsController,
+  createMyTutorLearningSessionController,
+  getMyTutorDailyAttendanceController,
+  updateMyTutorAttendanceController,
+} from "../controllers/tutorLearning.controller.js";
 
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { requireRole } from "../middlewares/role.middleware.js";
+
 import {
   verifyOrigin,
   verifyCsrfToken,
@@ -63,11 +73,90 @@ function validateParams(schema) {
 }
 
 // ==========================================
-// GET PROFIL TUTOR YANG SEDANG LOGIN
+// TUTOR LEARNING VALIDATION
 // ==========================================
 
+const tutorLearningSessionSchema = z.object({
+  sessionDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Tanggal sesi tidak valid.")
+    .optional(),
+
+  startTime: z.string().nullable().optional(),
+  endTime: z.string().nullable().optional(),
+
+  sessionType: z
+    .enum(["scheduled", "clinic", "private", "small_group", "makeup", "other"])
+    .optional(),
+
+  notes: z.string().nullable().optional(),
+
+  students: z
+    .array(
+      z.object({
+        studentId: z.uuid("ID siswa tidak valid."),
+
+        attendanceStatus: z.enum([
+          "present",
+          "late",
+          "sick",
+          "permission",
+          "absent",
+        ]),
+
+        attendanceNote: z.string().nullable().optional(),
+        checkInAt: z.string().nullable().optional(),
+        checkOutAt: z.string().nullable().optional(),
+
+        subjectId: z.uuid().nullable().optional(),
+        materialId: z.uuid().nullable().optional(),
+
+        topic: z.string().nullable().optional(),
+        activityNotes: z.string().nullable().optional(),
+        strengths: z.string().nullable().optional(),
+        difficulties: z.string().nullable().optional(),
+        followUp: z.string().nullable().optional(),
+
+        score: z.number().nonnegative().nullable().optional(),
+        maxScore: z.number().positive().nullable().optional(),
+      }),
+    )
+    .min(1, "Minimal satu siswa harus dipilih."),
+});
+
+// ==========================================
+// TUTOR ATTENDANCE VALIDATOR
+// ==========================================
+
+const updateTutorAttendanceSchema = z.object({
+  attendanceStatus: z.enum(["present", "late", "sick", "permission", "absent"]),
+
+  attendanceNote: z.string().nullable().optional(),
+
+  report: z
+    .object({
+      subjectId: z.uuid(),
+      materialId: z.uuid().nullable().optional(),
+      topic: z.string().trim().min(1),
+      activityNotes: z.string().nullable().optional(),
+      strengths: z.string().nullable().optional(),
+      difficulties: z.string().nullable().optional(),
+      followUp: z.string().nullable().optional(),
+      score: z.number().min(0).nullable().optional(),
+      maxScore: z.number().positive().nullable().optional(),
+    })
+    .nullable()
+    .optional(),
+});
+
+// ==========================================
+// TUTOR SELF SERVICE
+// ==========================================
+
+// GET PROFIL TUTOR
 router.get("/me", authenticate, requireRole("tutor"), getMyTutorProfile);
 
+// GET SISWA SAYA
 router.get(
   "/me/students",
   authenticate,
@@ -75,8 +164,65 @@ router.get(
   getMyTutorStudentsController,
 );
 
+// GET DETAIL SISWA
+router.get(
+  "/me/students/:id",
+  authenticate,
+  requireRole("tutor"),
+  getMyTutorStudentDetailController,
+);
+
 // ==========================================
-// AUTHORIZATION
+// TUTOR: KEHADIRAN & LAPORAN BELAJAR
+// ==========================================
+
+// GET DAFTAR MATA PELAJARAN AKTIF
+router.get(
+  "/me/learning/subjects",
+  authenticate,
+  requireRole("tutor"),
+  getMyTutorLearningSubjectsController,
+);
+
+// CREATE KEHADIRAN + LAPORAN BELAJAR
+router.post(
+  "/me/learning/sessions",
+  authenticate,
+  requireRole("tutor"),
+  verifyOrigin,
+  verifyCsrfToken,
+  validate(tutorLearningSessionSchema),
+  createMyTutorLearningSessionController,
+);
+
+// ==========================================
+// TUTOR DAILY ATTENDANCE
+// ==========================================
+
+router.get(
+  "/me/attendance/daily",
+  authenticate,
+  requireRole("tutor"),
+  getMyTutorDailyAttendanceController,
+);
+
+router.patch(
+  "/me/attendance/:attendanceId",
+  authenticate,
+  requireRole("tutor"),
+  verifyOrigin,
+  verifyCsrfToken,
+  validateParams(
+    z.object({
+      attendanceId: z.uuid(),
+    }),
+  ),
+  validate(updateTutorAttendanceSchema),
+  updateMyTutorAttendanceController,
+);
+
+// ==========================================
+// ADMIN AUTHORIZATION
 // ==========================================
 
 router.use(authenticate, requireRole("super_admin"));
@@ -129,17 +275,6 @@ router.put(
   validate(updateTutorSchema),
   updateTutorController,
 );
-
-// ==========================================
-// PATCH: AKTIFKAN / NONAKTIFKAN TUTOR
-// ==========================================
-
-export async function updateTutorStatus(id, isActive) {
-  return apiRequest(`/api/tutors/${id}/status`, {
-    method: "PATCH",
-    body: JSON.stringify({ isActive }),
-  });
-}
 
 // ==========================================
 // PATCH: AKTIFKAN / NONAKTIFKAN TUTOR

@@ -45,6 +45,7 @@ const studentSelect = `
     s.city,
     s.province,
     s.student_phone AS "studentPhone",
+    s.parent_phone AS "parentPhone",
     s.notes,
     s.status,
     s.created_at AS "createdAt",
@@ -523,4 +524,36 @@ export async function getMyTutorStudents({
       totalPages: Math.max(1, Math.ceil(total / limit)),
     },
   };
+}
+
+// ==========================================
+// GET STUDENT DETAIL FOR LOGGED-IN TUTOR
+// ==========================================
+
+export async function getMyTutorStudentById(userId, studentId) {
+  const result = await pool.query(
+    `
+      ${studentSelect}
+      WHERE s.id = $1
+        AND s.deleted_at IS NULL
+        AND s.status = 'active'
+        AND EXISTS (
+          SELECT 1
+          FROM tutor_profiles tp
+          INNER JOIN tutor_branch_assignments tba
+            ON tba.tutor_id = tp.id
+          WHERE tp.user_id = $2
+            AND tba.branch_id = s.primary_branch_id
+            AND tba.assigned_from <= CURRENT_DATE
+            AND (
+              tba.assigned_until IS NULL
+              OR tba.assigned_until >= CURRENT_DATE
+            )
+        )
+      LIMIT 1
+    `,
+    [studentId, userId],
+  );
+
+  return result.rows[0] || null;
 }
