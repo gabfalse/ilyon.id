@@ -58,28 +58,6 @@ export async function updateTutorStatus(id, isActive) {
 }
 
 // ==========================================
-// GET TUTOR BY LOGIN USER ID
-// ==========================================
-
-export async function getTutorByUserId(userId) {
-  const result = await pool.query(
-    `
-      SELECT id
-      FROM tutor_profiles
-      WHERE user_id = $1
-      LIMIT 1
-    `,
-    [userId],
-  );
-
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  return getTutorById(result.rows[0].id);
-}
-
-// ==========================================
 // GET PROFIL TUTOR YANG SEDANG LOGIN
 // ==========================================
 
@@ -95,4 +73,51 @@ export async function getMyTutorStudents(params = {}) {
   const query = new URLSearchParams(params).toString();
 
   return apiRequest(`/api/tutors/me/students${query ? `?${query}` : ""}`);
+}
+
+// ==========================================
+// GET MY TUTOR STUDENT DETAIL
+// ==========================================
+
+export async function getMyTutorStudentDetail(studentId) {
+  return apiRequest(`/api/tutors/me/students/${encodeURIComponent(studentId)}`);
+}
+
+// ==========================================
+// TUTOR: KEHADIRAN & LAPORAN BELAJAR
+// ==========================================
+
+// GET MATA PELAJARAN AKTIF
+export async function getMyTutorLearningSubjects() {
+  return apiRequest("/api/tutors/me/learning/subjects");
+}
+
+// SIMPAN KEHADIRAN + LAPORAN BELAJAR
+export async function createMyTutorLearningSession(payload) {
+  return apiRequest("/api/tutors/me/learning/sessions", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+// ==========================================
+// TUTOR: KEHADIRAN HARIAN
+// ==========================================
+
+// GET DAFTAR KEHADIRAN BERDASARKAN TANGGAL
+export async function getMyTutorDailyAttendance(date) {
+  return apiRequest(
+    `/api/tutors/me/attendance/daily?date=${encodeURIComponent(date)}`,
+  );
+}
+
+// UPDATE KEHADIRAN DAN LAPORAN BELAJAR
+export async function updateMyTutorAttendance(attendanceId, payload) {
+  return apiRequest(
+    `/api/tutors/me/attendance/${encodeURIComponent(attendanceId)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+  );
 }

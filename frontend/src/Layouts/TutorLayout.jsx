@@ -3,26 +3,20 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../Contexts/AuthContext";
 
 const TUTOR_MENU = [
-  {
-    label: "Dashboard",
-    path: "/tutor/dashboard",
-    icon: "⌂",
-  },
-  {
-    label: "Siswa Saya",
-    path: "/tutor/siswa",
-    icon: "♙",
-  },
+  { label: "Dashboard", path: "/tutor/dashboard", icon: "⌂" },
+  { label: "Siswa Saya", path: "/tutor/siswa", icon: "♙" },
   {
     label: "Kehadiran & Laporan Belajar",
     path: "/tutor/laporan-belajar",
     icon: "▤",
   },
   {
-    label: "Profil Saya",
-    path: "/tutor/profil",
-    icon: "⚙",
+    label: "Kehadiran Harian",
+    path: "/tutor/kehadiran-harian",
+    icon: "▦",
   },
+
+  { label: "Profil Saya", path: "/tutor/profil", icon: "⚙" },
 ];
 
 export default function TutorLayout() {

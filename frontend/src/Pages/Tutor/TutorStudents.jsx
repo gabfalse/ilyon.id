@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { getMyTutorStudents } from "../../Services/TutorService";
+import { Link } from "react-router-dom";
 
 export default function TutorStudents() {
   const [students, setStudents] = useState([]);
@@ -65,6 +66,21 @@ export default function TutorStudents() {
       month: "long",
       year: "numeric",
     });
+  };
+
+  const getWhatsAppNumber = (phone) => {
+    if (!phone) return "";
+
+    let number = String(phone).replace(/\D/g, "");
+
+    // Ubah awalan 0 menjadi kode negara Indonesia
+    if (number.startsWith("0")) {
+      number = `62${number.slice(1)}`;
+    } else if (number.startsWith("8")) {
+      number = `62${number}`;
+    }
+
+    return number;
   };
 
   return (
@@ -159,9 +175,12 @@ export default function TutorStudents() {
                 >
                   <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-gray-900">
+                      <Link
+                        to={`/tutor/siswa/${student.id}`}
+                        className="font-semibold text-indigo-700 hover:text-indigo-900 hover:underline"
+                      >
                         {student.fullName}
-                      </h3>
+                      </Link>
 
                       {student.nickname && (
                         <p className="mt-1 text-sm text-gray-500">
@@ -220,17 +239,41 @@ export default function TutorStudents() {
                     </div>
 
                     <div>
-                      <p className="text-xs text-gray-500">Kota</p>
+                      <p className="text-xs text-gray-500">Alamat</p>
                       <p className="mt-1 text-sm font-medium text-gray-800">
-                        {student.city || "-"}
+                        {student.address || "-"}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-xs text-gray-500">Nomor Telepon</p>
-                      <p className="mt-1 text-sm font-medium text-gray-800">
-                        {student.studentPhone || "-"}
+                      <p className="text-xs text-gray-500">
+                        WhatsApp Orang Tua
                       </p>
+
+                      {student.parentPhone ? (
+                        <a
+                          href={`https://wa.me/${getWhatsAppNumber(student.parentPhone)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-green-600 hover:text-green-700 hover:underline"
+                          title="Hubungi orang tua melalui WhatsApp"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 32 32"
+                            className="h-5 w-5 fill-current"
+                            aria-hidden="true"
+                          >
+                            <path d="M16 .8A15.1 15.1 0 0 0 3.05 23.66L1 31l7.52-1.97A15.1 15.1 0 1 0 16 .8Zm0 27.46a12.3 12.3 0 0 1-6.28-1.72l-.45-.27-4.47 1.17 1.2-4.36-.29-.46A12.35 12.35 0 1 1 16 28.26Zm6.77-9.25c-.37-.19-2.18-1.08-2.52-1.2-.34-.13-.58-.19-.82.19-.24.37-.95 1.2-1.16 1.44-.22.24-.43.27-.8.08-.37-.19-1.55-.57-2.96-1.83-1.09-.97-1.83-2.17-2.04-2.54-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.21.25-.37.37-.61.13-.24.06-.46-.03-.65-.1-.19-.83-2-.1-2.73.2-.2.45-.25.73-.25h.53c.17 0 .4-.06.62.46.22.52.74 1.81.81 1.94.06.13.1.28.02.47-.08.19-.12.3-.24.47-.12.16-.25.36-.36.48-.12.13-.25.27-.11.52.14.24.64 1.05 1.38 1.7.95.85 1.75 1.11 2 .31.25.19.42.16.58-.03.16-.19.67-.78.85-1.05.18-.27.37-.22.62-.13.25.1 1.57.74 1.84.87.27.13.45.2.52.31.07.12.07.68-.16 1.34-.23.66-1.35 1.28-1.87 1.36-.49.08-1.1.12-1.78-.1Z" />
+                          </svg>
+
+                          <span>{student.parentPhone}</span>
+                        </a>
+                      ) : (
+                        <p className="mt-1 text-sm font-medium text-gray-400">
+                          Belum tersedia
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
