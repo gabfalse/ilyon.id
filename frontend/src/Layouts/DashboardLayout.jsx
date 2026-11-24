@@ -16,7 +16,7 @@ const ROLE_CONFIG = {
         path: "/admin/enrollment-contracts",
         icon: "▤",
       },
-      { label: "Data Orang Tua", path: "/admin/parents", icon: "♧" },
+      // { label: "Data Orang Tua", path: "/admin/parents", icon: "♧" },
       {
         label: "Konfirmasi Pengajuan Anak",
         path: "/admin/parent-student-claims",
@@ -39,6 +39,11 @@ const ROLE_CONFIG = {
     initial: "AC",
     menu: [
       { label: "Dashboard", path: "/branch/dashboard", icon: "⌂" },
+      {
+        label: "Konfirmasi Pengajuan Anak",
+        path: "/branch/parent-student-claims",
+        icon: "✓",
+      },
       { label: "Data Siswa", disabled: true, icon: "♙" },
       { label: "Data Tutor", disabled: true, icon: "♧" },
       { label: "Program Belajar", path: "/branch/programs", icon: "▤" },
@@ -62,6 +67,19 @@ const ROLE_CONFIG = {
     ],
   },
 
+  user: {
+    label: "Pengguna",
+    initial: "U",
+    menu: [
+      { label: "Dashboard", path: "/user/dashboard", icon: "⌂" },
+      {
+        label: "Pengaturan Akun",
+        path: "/user/pengaturan-akun",
+        icon: "⚙",
+      },
+    ],
+  },
+
   parent: {
     label: "Orang Tua",
     initial: "OT",
@@ -70,8 +88,14 @@ const ROLE_CONFIG = {
       { label: "Data Anak", path: "/parent/data-anak", icon: "♙" },
       // { label: "Jadwal Belajar", disabled: true, icon: "▦" },
       // { label: "Perkembangan Anak", disabled: true, icon: "▥" },
-      { label: "Tagihan", disabled: true, icon: "◎" },
+      // { label: "Tagihan", disabled: true, icon: "◎" },
       // { label: "Riwayat Pembayaran", disabled: true, icon: "▤" },
+      { label: "Recruitment", path: "/recruitment", icon: "♧" },
+      {
+        label: "Pengaturan Akun",
+        path: "/parent/pengaturan-akun",
+        icon: "⚙",
+      },
     ],
   },
 };
@@ -86,9 +110,20 @@ export default function DashboardLayout() {
 
   const userRoles = user?.roles ?? [];
 
-  const roleCode = ["super_admin", "branch_admin", "tutor", "parent"].find(
-    (role) => userRoles.some((item) => item.roleCode === role),
-  );
+  const hasRole = (role) => userRoles.some((item) => item.roleCode === role);
+
+  // Role khusus tetap diprioritaskan.
+  const privilegedRole = ["super_admin", "branch_admin", "tutor"].find(hasRole);
+
+  // Role user dan parent mengikuti mode akun aktif.
+  const publicRole =
+    hasRole("user") || hasRole("parent")
+      ? user?.activeMode === "parent"
+        ? "parent"
+        : "user"
+      : null;
+
+  const roleCode = privilegedRole || publicRole;
 
   const config = ROLE_CONFIG[roleCode];
 

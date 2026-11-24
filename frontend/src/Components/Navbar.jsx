@@ -39,6 +39,7 @@ const navLinks = [
   // { label: "Artikel", path: "/articles" },
   { label: "Karier", path: "/recruitment" },
   { label: "Kontak", path: "/contact" },
+  { label: "FAQ", path: "/faq" },
 ];
 
 export default function Navbar() {

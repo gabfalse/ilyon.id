@@ -8,14 +8,13 @@ import BranchPage from "../Pages/Admin/Branches/BranchPage";
 import StudentPage from "../Pages/Admin/Students/StudentPage";
 import EnrollmentPage from "../Pages/Admin/Enrollments/EnrollmentPage";
 import EnrollmentContractPage from "../Pages/Admin/EnrollmentContracts/EnrollmentContractPage";
-import ParentPage from "../Pages/Admin/Parents/ParentPage";
+import ParentStudentClaimsPage from "../Pages/Admin/Parents/ParentStudentClaimsPage";
 import TutorPage from "../Pages/Admin/Tutors/TutorPage";
 import StaffPage from "../Pages/Admin/Staff/StaffPage";
 import RecruitmentPage from "../Pages/Admin/Recruitment/RecruitmentPage";
 import UserManagementPage from "../Pages/Admin/UserManagement/UserManagementPage";
 import ProgramPage from "../Pages/Admin/Programs/ProgramPage";
 import SubjectPage from "../Pages/Admin/Subjects/SubjectPage";
-import ParentStudentClaimsPage from "../Pages/Admin/Parents/ParentStudentClaimsPage";
 
 export default function AdminRoutes() {
   return (
@@ -37,7 +36,10 @@ export default function AdminRoutes() {
             element={<EnrollmentContractPage />}
           />
 
-          <Route path="parents" element={<ParentPage />} />
+          <Route
+            path="parents"
+            element={<Navigate to="/admin/parent-student-claims" replace />}
+          />
 
           <Route path="tutors" element={<TutorPage />} />
 

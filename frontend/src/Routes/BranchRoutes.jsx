@@ -4,8 +4,8 @@ import ProtectedRoute from "../Components/ProtectedRoute";
 import DashboardLayout from "../Layouts/DashboardLayout";
 
 import BranchAdminDashboard from "../Pages/BranchAdmin/Dashboard";
-import ParentPage from "../Pages/Admin/Parents/ParentPage";
 import SubjectPage from "../Pages/Admin/Subjects/SubjectPage";
+import ParentStudentClaimsPage from "../Pages/Admin/Parents/ParentStudentClaimsPage";
 
 export default function BranchRoutes() {
   return (
@@ -16,7 +16,10 @@ export default function BranchRoutes() {
 
           <Route path="dashboard" element={<BranchAdminDashboard />} />
 
-          <Route path="parents" element={<ParentPage />} />
+          <Route
+            path="parent-student-claims"
+            element={<ParentStudentClaimsPage />}
+          />
 
           <Route path="subjects" element={<SubjectPage />} />
         </Route>

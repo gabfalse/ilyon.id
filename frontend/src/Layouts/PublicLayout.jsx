@@ -1,4 +1,5 @@
-import { Link, Outlet } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 
 const FOOTER_LINKS = [
@@ -13,6 +14,13 @@ const FOOTER_LINKS = [
 ];
 
 export default function PublicLayout() {
+  const { pathname } = useLocation();
+
+  // Kembalikan posisi layar ke atas setiap berpindah halaman
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-foreground">
       {/* NAVBAR */}

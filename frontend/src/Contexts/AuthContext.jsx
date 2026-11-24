@@ -6,7 +6,7 @@ import {
   useCallback,
   useRef,
 } from "react";
-
+import { switchAccountMode as requestAccountModeSwitch } from "../Services/AccountService";
 import { setActiveBranchId } from "../Services/Api";
 
 const AuthContext = createContext(null);
@@ -213,6 +213,33 @@ export function AuthProvider({ children }) {
   }, [clearActiveBranch]);
 
   // ==========================================
+  // SWITCH ACCOUNT MODE
+  // ==========================================
+
+  const switchAccountMode = useCallback(
+    async (activeMode) => {
+      // Kirim permintaan pergantian mode ke backend.
+      const result = await requestAccountModeSwitch(activeMode);
+
+      // Ambil ulang session agar role dan activeMode terbaru
+      // langsung diperbarui di AuthContext.
+      const updatedUser = await refreshUser();
+
+      if (!updatedUser) {
+        throw new Error(
+          "Mode akun berubah, tetapi session tidak dapat diperbarui. Silakan muat ulang halaman.",
+        );
+      }
+
+      return {
+        ...result,
+        user: updatedUser,
+      };
+    },
+    [refreshUser],
+  );
+
+  // ==========================================
   // LOGIN
   // ==========================================
 
@@ -401,6 +428,7 @@ export function AuthProvider({ children }) {
     resendEmailOtp,
     logout,
     refreshUser,
+    switchAccountMode,
 
     hasRole,
     hasAnyRole,

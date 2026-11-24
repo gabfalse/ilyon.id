@@ -28,6 +28,11 @@ const USER_MENU = [
     path: "/recruitment",
     icon: "♧",
   },
+  {
+    label: "Pengaturan Akun",
+    path: "/user/pengaturan-akun",
+    icon: "⚙",
+  },
   // {
   //   label: "Status Pengajuan",
   //   path: "/recruitment/tracking",

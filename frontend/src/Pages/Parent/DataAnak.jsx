@@ -13,6 +13,7 @@ export default function DataAnak() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchChild, setSearchChild] = useState("");
 
   async function loadClaims() {
     try {
@@ -39,6 +40,17 @@ export default function DataAnak() {
   }, []);
 
   const linkedChildren = dashboard?.children || [];
+
+  const filteredChildren = linkedChildren.filter((child) => {
+    const keyword = searchChild.trim().toLowerCase();
+
+    if (!keyword) return true;
+
+    return (
+      (child.fullName || "").toLowerCase().includes(keyword) ||
+      (child.studentCode || "").toLowerCase().includes(keyword)
+    );
+  });
 
   const pendingClaims = claims.filter((claim) => claim.status === "pending");
 
@@ -125,6 +137,7 @@ export default function DataAnak() {
 
   return (
     <div className="space-y-6">
+      {/* HEADER */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-[#35485E]">Data Anak</h1>
@@ -142,12 +155,14 @@ export default function DataAnak() {
         </button>
       </div>
 
+      {/* ERROR */}
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
           {error}
         </div>
       )}
 
+      {/* STATISTIK */}
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Anak Terhubung</p>
@@ -171,6 +186,7 @@ export default function DataAnak() {
         </div>
       </div>
 
+      {/* ANAK TERHUBUNG */}
       <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-[#35485E]">Anak Terhubung</h2>
@@ -185,15 +201,29 @@ export default function DataAnak() {
           </button>
         </div>
 
+        {!loading && linkedChildren.length > 0 && (
+          <input
+            type="text"
+            value={searchChild}
+            onChange={(e) => setSearchChild(e.target.value)}
+            placeholder="Cari nama atau kode siswa..."
+            className="mt-4 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#70B8AE] sm:max-w-md"
+          />
+        )}
+
         {loading ? (
           <p className="mt-5 text-sm text-gray-500">Memuat data anak...</p>
         ) : linkedChildren.length === 0 ? (
           <p className="mt-5 rounded-xl bg-gray-50 p-6 text-center text-sm text-gray-500">
             Belum ada anak yang terhubung melalui pengajuan.
           </p>
+        ) : filteredChildren.length === 0 ? (
+          <p className="mt-5 rounded-xl bg-gray-50 p-6 text-center text-sm text-gray-500">
+            Anak yang dicari tidak ditemukan.
+          </p>
         ) : (
           <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {linkedChildren.map((child) => (
+            {filteredChildren.map((child) => (
               <div
                 key={child.id}
                 className="rounded-xl border border-gray-100 p-5 transition hover:border-[#70B8AE]"
@@ -233,6 +263,7 @@ export default function DataAnak() {
         )}
       </section>
 
+      {/* RIWAYAT PENGAJUAN */}
       <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-[#35485E]">Riwayat Pengajuan</h2>
 

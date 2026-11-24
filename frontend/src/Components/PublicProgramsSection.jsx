@@ -88,7 +88,7 @@ export default function PublicProgramsSection() {
             to="/programs"
             className="shrink-0 font-bold text-[#529F93] transition hover:text-[#35485E]"
           >
-            Lihat Semua Program →
+            Lihat Semua Program
           </Link>
         </div>
 
@@ -289,7 +289,7 @@ export default function PublicProgramsSection() {
                     to={`/programs/${getProgramSlug(program)}`}
                     className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-[#529F93] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#438B80]"
                   >
-                    Lihat Detail Program →
+                    Lihat Detail Program
                   </Link>
                 </article>
               );
@@ -305,7 +305,7 @@ export default function PublicProgramsSection() {
               to="/programs"
               className="inline-flex items-center justify-center rounded-xl border border-[#529F93]/30 px-6 py-3 text-sm font-bold text-[#529F93] transition hover:bg-[#EAF5F3]"
             >
-              Jelajahi Semua Program →
+              Jelajahi Semua Program
             </Link>
           </div>
         )}

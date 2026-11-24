@@ -7,7 +7,7 @@ const QUICK_LINKS = [
   {
     title: "Program Belajar",
     description: "Kenali berbagai program pembelajaran Ilyon Academy.",
-    path: "/user/programs",
+    path: "/programs",
     icon: "▤",
   },
   {
@@ -317,7 +317,7 @@ export default function UserDashboard() {
               </p>
 
               <p className="mt-4 text-sm font-semibold text-[#529F93]">
-                Pelajari lebih lanjut →
+                Pelajari lebih lanjut
               </p>
             </Link>
           ))}

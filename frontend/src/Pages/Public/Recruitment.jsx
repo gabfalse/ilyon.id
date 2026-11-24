@@ -110,7 +110,7 @@ export default function Recruitment() {
             to="/recruitment/tracking"
             className="text-sm font-bold text-primary hover:underline"
           >
-            Lacak Lamaran Saya →
+            Lacak Lamaran Saya
           </Link>
         </div>
 
@@ -206,7 +206,7 @@ export default function Recruitment() {
                     to={`/recruitment/${vacancy.id}`}
                     className="flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-extrabold text-white transition hover:opacity-90"
                   >
-                    Lihat Detail Lowongan →
+                    Lihat Detail Lowongan
                   </Link>
                 </div>
               </article>
