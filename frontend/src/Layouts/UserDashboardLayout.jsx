@@ -20,7 +20,7 @@ const USER_MENU = [
   },
   {
     label: "Pendaftaran Siswa",
-    path: "/user/student-registration",
+    path: "/user/pengaturan-akun",
     icon: "♙",
   },
   {

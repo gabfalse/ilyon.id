@@ -56,3 +56,43 @@ export async function updateTutorStatus(id, isActive) {
     body: JSON.stringify({ isActive }),
   });
 }
+
+// ==========================================
+// GET TUTOR BY LOGIN USER ID
+// ==========================================
+
+export async function getTutorByUserId(userId) {
+  const result = await pool.query(
+    `
+      SELECT id
+      FROM tutor_profiles
+      WHERE user_id = $1
+      LIMIT 1
+    `,
+    [userId],
+  );
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  return getTutorById(result.rows[0].id);
+}
+
+// ==========================================
+// GET PROFIL TUTOR YANG SEDANG LOGIN
+// ==========================================
+
+export async function getMyTutorProfile() {
+  return apiRequest("/api/tutors/me");
+}
+
+// ==========================================
+// GET MY TUTOR STUDENTS
+// ==========================================
+
+export async function getMyTutorStudents(params = {}) {
+  const query = new URLSearchParams(params).toString();
+
+  return apiRequest(`/api/tutors/me/students${query ? `?${query}` : ""}`);
+}

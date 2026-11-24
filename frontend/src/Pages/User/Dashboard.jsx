@@ -13,7 +13,7 @@ const QUICK_LINKS = [
   {
     title: "Pendaftaran Siswa",
     description: "Pelajari informasi dan proses pendaftaran siswa.",
-    path: "/user/student-registration",
+    path: "/user/pengaturan-akun",
     icon: "♙",
   },
   {

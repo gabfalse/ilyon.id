@@ -166,10 +166,10 @@ export default function Home() {
             {/* CTA */}
             <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
               <Link
-                to="/programs"
+                to="/auth/register"
                 className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#529F93] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#529F93]/20 transition hover:-translate-y-0.5 hover:bg-[#438B80] sm:w-auto"
               >
-                Jelajahi Program
+                Daftarkan Siswa
                 <ArrowRight size={18} />
               </Link>
 
